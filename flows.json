@@ -1,0 +1,560 @@
+[
+    {
+        "id": "ce281aa634928e0f",
+        "type": "tab",
+        "label": "RQ",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
+        "id": "2921484187591b64",
+        "type": "inject",
+        "z": "ce281aa634928e0f",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 180,
+        "y": 60,
+        "wires": [
+            [
+                "a195c9f1e850c003"
+            ]
+        ]
+    },
+    {
+        "id": "c64453e920fe74ec",
+        "type": "function",
+        "z": "ce281aa634928e0f",
+        "name": "set Headers",
+        "func": "const oauth1a = global.get('oauth1');\nconst crypto = global.get('crypto');\n\nconst CONSUMERKEY = '515343a0dd921d8a4d791e4c820f24d0846abb5f4085833e9355514a70b98cdc';\nconst CONSUMERSECRET = '66ccc8023769bc6720997f74be1474e33ec2d1c9015f5fe199f4bfd3f9c97d09';\nconst TOKENKEY = '4f85ec1fd6a9ce3a64d7e95e374d9666ff5df7266734843381a33865c03f8b3c';\nconst TOKENSECRET = 'b8c97c45dfa261017d6d1ae136729146c4adb7f0d600e0397c9ff24ec9d00b92';\nconst REALM = '6125688_SB1';\n\n// const apiUrl = 'https://6125688-sb1.suitetalk.api.netsuite.com/services/rest/record/v1/purchaseRequisition';\n// const method = 'POST';\n\nconst getAuthHeaderForRequest = (request) => {\n    const oauth = oauth1a({\n        consumer: { key: CONSUMERKEY, secret: CONSUMERSECRET },\n        signature_method: 'HMAC-SHA256',\n        hash_function(base_string, key) {\n            return crypto\n                .createHmac('sha256', key)\n                .update(base_string)\n                .digest('base64')\n        },\n    })\n\n    const authorization = oauth.authorize(request, {\n        key: TOKENKEY,\n        secret: TOKENSECRET,\n    });\n\n    return oauth.toHeader(authorization);\n}\n\n// Generación de Authorization Header\nconst request = {\n    url: msg.apiUrl,\n    method: msg.method\n};\nconst authHeader = getAuthHeaderForRequest(request);\nauthHeader.Authorization = `${authHeader.Authorization}, realm=\"${REALM}\"`;\n\n// msg.method = method;\n// msg.apiUrl = apiUrl;\nmsg.headers = authHeader;\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 710,
+        "y": 580,
+        "wires": [
+            [
+                "054b3b807a01a227"
+            ]
+        ]
+    },
+    {
+        "id": "054b3b807a01a227",
+        "type": "http request",
+        "z": "ce281aa634928e0f",
+        "name": "POST Solicitud",
+        "method": "use",
+        "ret": "txt",
+        "paytoqs": "ignore",
+        "url": "https://6125688-sb1.suitetalk.api.netsuite.com/services/rest/record/v1/purchaseRequisition",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "insecureHTTPParser": false,
+        "authType": "",
+        "senderr": false,
+        "headers": [],
+        "x": 820,
+        "y": 660,
+        "wires": [
+            [
+                "75475154086a20a9",
+                "61388433a158069b",
+                "830e7caedcd0686d"
+            ]
+        ]
+    },
+    {
+        "id": "5d2b9cf20db88b48",
+        "type": "function",
+        "z": "ce281aa634928e0f",
+        "name": "set Params",
+        "func": "msg.method = 'POST';\nmsg.apiUrl = 'https://6125688-sb1.suitetalk.api.netsuite.com/services/rest/record/v1/purchaseRequisition'\nmsg.payload = {\n    \"entity\": {\n        \"id\": \"22\"\n    },\n    \"trandate\": \"2024-01-27\",\n    \"subsidiary\": \"3\",\n    \"department\": \"52\",\n    \"class\": \"16\",\n    \"location\": \"302\",\n    \"item\": {\n        \"items\": [\n            {\n                \"item\": {\n                    \"id\": \"1091\"\n                },\n                \"quantity\": 10,\n                \"rate\": 24,\n                \"estimatedrate\": 24 \n            },\n            {\n                \"item\": {\n                    \"id\": \"1093\"\n                },\n                \"quantity\": 8,\n                \"rate\": 25,\n                \"estimatedrate\": 25 \n            }\n        ]\n    }\n};\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 630,
+        "y": 500,
+        "wires": [
+            [
+                "c64453e920fe74ec"
+            ]
+        ]
+    },
+    {
+        "id": "df97635f0da42fcb",
+        "type": "function",
+        "z": "ce281aa634928e0f",
+        "name": "function 324",
+        "func": "\nmsg.result = msg.resultados[msg.contador].PETI_COD_PETICION;\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 550,
+        "y": 420,
+        "wires": [
+            [
+                "5d2b9cf20db88b48",
+                "791f8c5e28105e8a"
+            ]
+        ]
+    },
+    {
+        "id": "61388433a158069b",
+        "type": "debug",
+        "z": "ce281aa634928e0f",
+        "name": "debug 316",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "result",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 950,
+        "y": 580,
+        "wires": []
+    },
+    {
+        "id": "49f71ad4c23153a7",
+        "type": "debug",
+        "z": "ce281aa634928e0f",
+        "name": "debug 317",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 490,
+        "y": 140,
+        "wires": []
+    },
+    {
+        "id": "4ac98b2de4548ef4",
+        "type": "change",
+        "z": "ce281aa634928e0f",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "total",
+                "pt": "msg",
+                "to": "payload.length",
+                "tot": "msg"
+            },
+            {
+                "t": "set",
+                "p": "init",
+                "pt": "msg",
+                "to": "contador",
+                "tot": "msg"
+            },
+            {
+                "t": "set",
+                "p": "resultados",
+                "pt": "msg",
+                "to": "payload",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 460,
+        "y": 340,
+        "wires": [
+            [
+                "df97635f0da42fcb",
+                "753b16e4d126d40d"
+            ]
+        ]
+    },
+    {
+        "id": "75475154086a20a9",
+        "type": "function",
+        "z": "ce281aa634928e0f",
+        "name": "function 325",
+        "func": "msg.contador = msg.contador + 1;\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 530,
+        "y": 980,
+        "wires": [
+            [
+                "e84a5712d1c91c6c"
+            ]
+        ]
+    },
+    {
+        "id": "e84a5712d1c91c6c",
+        "type": "switch",
+        "z": "ce281aa634928e0f",
+        "name": "",
+        "property": "contador",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "lt",
+                "v": "total",
+                "vt": "msg"
+            },
+            {
+                "t": "gte",
+                "v": "total",
+                "vt": "msg"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 2,
+        "x": 270,
+        "y": 640,
+        "wires": [
+            [
+                "df97635f0da42fcb"
+            ],
+            [
+                "59bc90efd9905afd"
+            ]
+        ]
+    },
+    {
+        "id": "a350bb9eff490402",
+        "type": "debug",
+        "z": "ce281aa634928e0f",
+        "name": "debug 318",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1010,
+        "y": 840,
+        "wires": []
+    },
+    {
+        "id": "791f8c5e28105e8a",
+        "type": "debug",
+        "z": "ce281aa634928e0f",
+        "name": "debug 319",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "result",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 790,
+        "y": 360,
+        "wires": []
+    },
+    {
+        "id": "753b16e4d126d40d",
+        "type": "debug",
+        "z": "ce281aa634928e0f",
+        "name": "debug 320",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 650,
+        "y": 260,
+        "wires": []
+    },
+    {
+        "id": "f05b26a4f646d60e",
+        "type": "change",
+        "z": "ce281aa634928e0f",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "contador",
+                "pt": "msg",
+                "to": "0",
+                "tot": "num"
+            },
+            {
+                "t": "set",
+                "p": "result",
+                "pt": "msg",
+                "to": "\"\"",
+                "tot": "str"
+            },
+            {
+                "t": "set",
+                "p": "rq",
+                "pt": "msg",
+                "to": "",
+                "tot": "str"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 240,
+        "y": 220,
+        "wires": [
+            [
+                "69f00f483d4d3117"
+            ]
+        ]
+    },
+    {
+        "id": "830e7caedcd0686d",
+        "type": "switch",
+        "z": "ce281aa634928e0f",
+        "name": "",
+        "property": "payload",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "empty"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 1,
+        "x": 1010,
+        "y": 660,
+        "wires": [
+            [
+                "fe24007733c2f602"
+            ]
+        ]
+    },
+    {
+        "id": "fe24007733c2f602",
+        "type": "function",
+        "z": "ce281aa634928e0f",
+        "name": "function 326",
+        "func": "global.set(\"rqs[\" + msg.contador + \"]\", msg.resultados[msg.contador].PETI_COD_PETICION);\nmsg.arreglo = global.get(\"rqs\");\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1170,
+        "y": 660,
+        "wires": [
+            [
+                "81b3b7b1da8359f2"
+            ]
+        ]
+    },
+    {
+        "id": "81b3b7b1da8359f2",
+        "type": "debug",
+        "z": "ce281aa634928e0f",
+        "name": "debug 321",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1230,
+        "y": 580,
+        "wires": []
+    },
+    {
+        "id": "69f00f483d4d3117",
+        "type": "function",
+        "z": "ce281aa634928e0f",
+        "name": "function 327",
+        "func": "global.set(\"rqs\", []);\nreturn msg;",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 350,
+        "y": 280,
+        "wires": [
+            [
+                "4ac98b2de4548ef4"
+            ]
+        ]
+    },
+    {
+        "id": "59bc90efd9905afd",
+        "type": "function",
+        "z": "ce281aa634928e0f",
+        "name": "function 328",
+        "func": "var arreglo = global.get(\"rqs\");\nvar unir = \"\";\nfor (let index = 0; index < arreglo.length; index++) {\n    unir = unir + \",\" + arreglo[index];\n}\n\n\nunir = unir.slice(1);\nvar query = \"update log.LOG_PETICION_ENC SET MIGRADO_RQ = 1 WHERE PETI_COD_PETICION IN (\" + unir + \")\";\n\nmsg.union = unir;\nmsg.arreglof = arreglo;\nmsg.payload = unir;\nmsg.queryfinal = query;\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 530,
+        "y": 780,
+        "wires": [
+            [
+                "6d193e13ef89be2a",
+                "c5731885899aa3a1"
+            ]
+        ]
+    },
+    {
+        "id": "6d193e13ef89be2a",
+        "type": "debug",
+        "z": "ce281aa634928e0f",
+        "name": "debug 322",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "queryfinal",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 710,
+        "y": 720,
+        "wires": []
+    },
+    {
+        "id": "da3ac73ea49094b0",
+        "type": "MSSQL",
+        "z": "ce281aa634928e0f",
+        "mssqlCN": "5f67b169fefd700b",
+        "name": "PE_OPTICAL_ERP",
+        "outField": "payload",
+        "returnType": 0,
+        "throwErrors": 1,
+        "query": "select  peti_cod_peticion,'cod_usuario' idEntity_, format(PETD_FEC_EMISION,'yyyy-mm-dd') trandate, \r\n2 approvalstatus, ID_interno_Sub subsidiary, PRFI_COD_COMPONENTE, PRFV_DES_COMPONENTE, ID_interno_de  departamento, 15 class, 'no lo manejamos en el RQ' location_log,     \r\nPEDV_COD_CONCEPTO item_externalid,PEDN_CANTIDAD quantity,PEDN_PUNITARIO rate, PEDN_PUNITARIO estimaterate \r\nfrom log.LOG_PETICION_ENC \r\ninner join log.log_peticion_Det on PETI_COD_PETICION = PEDI_COD_PETICION and PETI_EST_REGISTRO = 1 and PEDI_EST_REGISTRO = 1\r\ninner join dbo.Subsidiarias_ERP on PETI_COD_EMPRESA = codemplog  \r\ninner join log.LOG_PETICION_REFERENCIA on PETI_COD_PETICION = PRFI_COD_PETICION and PRFI_EST_REGISTRO = 1\r\nleft join dbo.Departamentos_ERP on PRFI_COD_COMPONENTE = CodCCLOG\r\nwhere PETI_COD_ESTADO = 94 and PETD_FEC_EMISION >= '2024-01-01' and PETI_COD_DOCUMENTO = 24",
+        "modeOpt": "queryMode",
+        "modeOptType": "query",
+        "queryOpt": "payload",
+        "queryOptType": "editor",
+        "paramsOpt": "queryParams",
+        "paramsOptType": "none",
+        "rows": "rows",
+        "rowsType": "msg",
+        "parseMustache": true,
+        "params": [],
+        "x": 250,
+        "y": 500,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "a195c9f1e850c003",
+        "type": "MSSQL",
+        "z": "ce281aa634928e0f",
+        "mssqlCN": "5f67b169fefd700b",
+        "name": "Conexion con SQL Server ERP",
+        "outField": "payload",
+        "returnType": 0,
+        "throwErrors": 1,
+        "query": "SELECT top 100 PETI_COD_PETICION,PETI_COD_SESION,PETI_COD_EMPRESA FROM log.LOG_PETICION_ENC ",
+        "modeOpt": "queryMode",
+        "modeOptType": "query",
+        "queryOpt": "payload",
+        "queryOptType": "editor",
+        "paramsOpt": "queryParams",
+        "paramsOptType": "none",
+        "rows": "rows",
+        "rowsType": "msg",
+        "parseMustache": true,
+        "params": [],
+        "x": 250,
+        "y": 140,
+        "wires": [
+            [
+                "49f71ad4c23153a7",
+                "f05b26a4f646d60e"
+            ]
+        ]
+    },
+    {
+        "id": "c5731885899aa3a1",
+        "type": "MSSQL",
+        "z": "ce281aa634928e0f",
+        "mssqlCN": "5f67b169fefd700b",
+        "name": "",
+        "outField": "payload",
+        "returnType": "0",
+        "throwErrors": 1,
+        "query": "update log.LOG_PETICION_ENC SET MIGRADO_RQ = 1 WHERE PETI_COD_PETICION IN ({{{payload}}})",
+        "modeOpt": "queryMode",
+        "modeOptType": "query",
+        "queryOpt": "payload",
+        "queryOptType": "editor",
+        "paramsOpt": "",
+        "paramsOptType": "none",
+        "rows": "rows",
+        "rowsType": "msg",
+        "parseMustache": true,
+        "params": [],
+        "x": 800,
+        "y": 840,
+        "wires": [
+            [
+                "a350bb9eff490402"
+            ]
+        ]
+    },
+    {
+        "id": "5f67b169fefd700b",
+        "type": "MSSQL-CN",
+        "name": "PE_OPTICAL_ERP",
+        "server": "10.1.4.20",
+        "port": "1433",
+        "encyption": false,
+        "trustServerCertificate": false,
+        "database": "PE_OPTICAL_ERP_PROD_20240217_0700",
+        "useUTC": false,
+        "connectTimeout": "",
+        "requestTimeout": "",
+        "cancelTimeout": "",
+        "pool": "",
+        "parseJSON": false,
+        "enableArithAbort": true,
+        "readOnlyIntent": false
+    }
+]
