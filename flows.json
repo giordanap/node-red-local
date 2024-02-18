@@ -8,6 +8,24 @@
         "env": []
     },
     {
+        "id": "5f67b169fefd700b",
+        "type": "MSSQL-CN",
+        "name": "PE_OPTICAL_ERP",
+        "server": "10.1.4.20",
+        "port": "1433",
+        "encyption": false,
+        "trustServerCertificate": false,
+        "database": "PE_OPTICAL_ERP_PROD_20240218_0700",
+        "useUTC": false,
+        "connectTimeout": "",
+        "requestTimeout": "",
+        "cancelTimeout": "",
+        "pool": "",
+        "parseJSON": false,
+        "enableArithAbort": true,
+        "readOnlyIntent": false
+    },
+    {
         "id": "2921484187591b64",
         "type": "inject",
         "z": "ce281aa634928e0f",
@@ -538,23 +556,5 @@
                 "a350bb9eff490402"
             ]
         ]
-    },
-    {
-        "id": "5f67b169fefd700b",
-        "type": "MSSQL-CN",
-        "name": "PE_OPTICAL_ERP",
-        "server": "10.1.4.20",
-        "port": "1433",
-        "encyption": false,
-        "trustServerCertificate": false,
-        "database": "PE_OPTICAL_ERP_PROD_20240217_0700",
-        "useUTC": false,
-        "connectTimeout": "",
-        "requestTimeout": "",
-        "cancelTimeout": "",
-        "pool": "",
-        "parseJSON": false,
-        "enableArithAbort": true,
-        "readOnlyIntent": false
     }
 ]
